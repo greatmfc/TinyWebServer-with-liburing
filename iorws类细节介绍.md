@@ -6,7 +6,7 @@
 
 ## `liburing`库函数简介
 
-类中所使用到的库函数有`io_uring_queue_init_params`、`io_uring_get_sqe`、`io_uring_prep_`、`io_uring_sqe_set_data`、`io_uring_submit_and_wait`、`io_uring_peek_batch_cqe`等几个。
+`liburing`是`io_uring`原作者为更好地使用这一IO而封装的一系列库函数。类中所使用到的库函数有`io_uring_queue_init_params`、`io_uring_get_sqe`、`io_uring_prep_`、`io_uring_sqe_set_data`、`io_uring_submit_and_wait`、`io_uring_peek_batch_cqe`等几个。
 
 ### `io_uring_queue_init_params`
 
