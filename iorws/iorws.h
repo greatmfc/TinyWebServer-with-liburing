@@ -1,8 +1,8 @@
 #ifndef IORWS_H
 #define IORWS_H
 
-#include "../liburing/src/include/liburing.h"
 #include "../webserver.h"
+#include <liburing.h>
 #include <sys/resource.h>
 #include <cstddef>
 
