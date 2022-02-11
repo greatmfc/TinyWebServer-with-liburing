@@ -28,6 +28,12 @@ make test
 
 [iorws类细节介绍]: ./iorws类细节介绍.md
 
+
+
+## 使用方式
+
+先将上述的[liburing](https://github.com/axboe/liburing)库clone到本地，然后进入liburing进行make和make install；操作完成后回到本项目下输入make或make test。
+
 ## 已知问题
 
 使用webbench进行压力测试会有大量的failed，并在测试后无法通过浏览器正常访问，需要结束进程重启，但不影响继续进行压力测试；
