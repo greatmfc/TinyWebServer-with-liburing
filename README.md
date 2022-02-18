@@ -2,7 +2,7 @@
 
 ## 简介
 
-本项目是基于[TinyWebServer](https://github.com/qinguoyi/TinyWebServer)使用axboe封装的[liburing](https://github.com/axboe/liburing)库对项目中的epoll IO进行了替换和重写，实现了linux下的proactor+异步IO。
+本项目是基于[TinyWebServer](https://github.com/qinguoyi/TinyWebServer)使用axboe封装的[liburing](https://github.com/axboe/liburing)库对项目中的epoll IO进行了替换和重写，初步实现linux下的proactor。
 
 对liburing库的使用参考了该[io_uring-echo-server](https://github.com/frevib/io_uring-echo-server)的模型。
 
@@ -59,3 +59,7 @@ make test
 ## 线程版webbench
 
 在test_presure文件夹下的Webbench文件夹中存有使用线程库重写的webbench，粗略估算相较原程序性能下降50%，CPU和内存占用减少50%。需使用g++进行编译。
+
+## TODO
+
+加强封装，根据proactor模型优化代码结构。
