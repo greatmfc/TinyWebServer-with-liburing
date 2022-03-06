@@ -8,6 +8,8 @@
 
 #define BACKLOG 8192
 #define IORING_FEAT_FAST_POLL (1U << 5)
+constexpr auto WAIT_TIME = 0xffffff;
+constexpr auto QUEUE_DEPTH = 512;
 
 class iorws
 {
@@ -20,6 +22,7 @@ public:
 	void IO_eventListen();
 	void IO_eventLoop();
 	int init_registerfiles(void);
+	void deal_with_write(http_conn* user, unsigned int fd, int result);
 
 public:
 	WebServer* server;
