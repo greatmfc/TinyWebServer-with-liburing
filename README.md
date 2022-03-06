@@ -18,7 +18,7 @@
 
 取消了-m和-a选项，其他选项和原webserver保持一致。
 
-可以使用make test命令对服务器运行状况进行检测，输出文件名为test。
+可以使用make test命令开启AddressSanitizer进行检测，输出文件名为test。
 
 ```
 make test
@@ -30,15 +30,19 @@ make test
 
 
 
+（20220306）其他内容与原项目基本一致。
+
 ## 使用方式
 
 先将上述的[liburing](https://github.com/axboe/liburing)库clone到本地，然后进入liburing进行make和make install；操作完成后回到本项目下输入make或make test。
 
 ## 已知问题
 
-使用webbench进行压力测试会有大量的failed，并在测试后无法通过浏览器正常访问，需要结束进程重启，但不影响继续进行压力测试；
+~~使用webbench进行压力测试会有大量的failed，并在测试后无法通过浏览器正常访问，需要结束进程重启，但不影响继续进行压力测试；~~
 
-在wsl2上运行会出现无法分配内存的错误，需要使用sudo命令或root用户运行程序，虚拟机系统可正常运行。
+~~在wsl2上运行会出现无法分配内存的错误，需要使用sudo命令或root用户运行程序，虚拟机系统可正常运行。~~
+
+（20220306）使用webbench进行压力测试会有大量的failed，并在测试后直接错误跳出，errno为16。
 
 ## 性能对比
 
@@ -62,4 +66,6 @@ make test
 
 ## TODO
 
-加强封装，根据proactor模型优化代码结构。
+~~加强封装，根据proactor模型优化代码结构。~~
+
+（20220306）解决bug。
