@@ -5,7 +5,7 @@ iorws::iorws(WebServer* ser) : server(ser)
 	int ret;
 	registerfiles = 1;
 	memset(&params, 0, sizeof(params));
-	if (io_uring_queue_init_params(32768, &ring, &params) < 0) { //初始化队列深度并根据param设置ring的参数
+	if (io_uring_queue_init_params(QUEUE_DEPTH, &ring, &params) < 0) { //初始化队列深度并根据param设置ring的参数
 		perror("io_uring_init_failed...\n");
 		exit(1);
 	}
@@ -146,6 +146,24 @@ int iorws::init_registerfiles(void)
 	return 0;
 }
 
+void iorws::deal_with_write(http_conn* user, unsigned int fd, int result)
+{
+	user[fd].bytes_have_send += result;
+	user[fd].bytes_to_send -= result;
+	if (user[fd].bytes_have_send >= user[fd].m_iv[0].iov_len) //已发送完一个缓冲区的内容
+	{
+		user[fd].m_iv[0].iov_len = 0; //重置第一个缓冲区长度
+		user[fd].m_iv[1].iov_base = user[fd].m_file_address
+			+ (user[fd].bytes_have_send - user[fd].m_write_idx); //设置第二个缓冲区地址
+		user[fd].m_iv[1].iov_len = user[fd].bytes_to_send;
+	}
+	else //否则继续发送
+	{
+		user[fd].m_iv[0].iov_base = user[fd].m_write_buf + user[fd].bytes_have_send; //重新设置第一个缓冲区地址
+		user[fd].m_iv[0].iov_len = user[fd].m_iv[0].iov_len - user[fd].bytes_have_send;
+	}
+}
+
 void iorws::IO_eventListen()
 {
 	server->m_listenfd = socket(PF_INET, SOCK_STREAM, 0); 
@@ -206,14 +224,13 @@ void iorws::IO_eventListen()
 void iorws::IO_eventLoop()
 {
 	int m_close_log = server->m_close_log;
-	bool stop_server = false;
 	int ret = 0;
 	struct sockaddr_in client_addr;
 	socklen_t client_len = sizeof(client_addr);
 
 	add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0);
 	time_t saved_time = time(NULL);
-	while (!stop_server)
+	while (1)
 	{
 		int cqe_count;
 		struct io_uring_cqe *cqes[BACKLOG];
@@ -228,131 +245,33 @@ void iorws::IO_eventLoop()
 
 		//将准备好的队列填充到cqes中，并返回已准备好的数目，收割cqe
 		cqe_count = io_uring_peek_batch_cqe(&ring, cqes, sizeof(cqes) / sizeof(cqes[0]));
-		if (!cqe_count) {
+		assert(cqe_count >= 0);
+		if (cqe_count==0) {
 			add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0);
+			continue;
 		}
 		if (server->m_DebugMode) {
-			printf("Returned from cqe is %d\n", cqe_count);
+			printf("Returned from cqe_count is %d\n", cqe_count);
 		}
+
 		for (int i = 0; i < cqe_count; ++i) {
 			struct io_uring_cqe* cqe = cqes[i];
 			conn_info* user_data = (conn_info*)io_uring_cqe_get_data(cqe);
 			int type = user_data->type;
 
-			if (type == READ) {
-				int bytes_have_read = cqe->res;
-				io_uring_cqe_seen(&ring, cqe);
-				if (server->m_DebugMode) {
-					printf("Returned from READ is %d\n", bytes_have_read);
-				}
-				util_timer* timer = (*users_timer)[user_data->fd].timer;
-				(*users)[user_data->fd].m_read_idx += bytes_have_read;
-
-				if (bytes_have_read <= 0) { 
-					if (server->m_DebugMode) {
-						printf("closing...\n");
-						printf("the read idx is %d\n", (*users)[user_data->fd].m_read_idx);
-					}
-					if ((*users_timer)[user_data->fd].timer_exist) {
-						server->deal_timer(timer, user_data->fd);
-					}
-					else close(user_data->fd);
-					add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0);
-				}
-				else {
-					LOG_INFO("deal with the client(%s)", inet_ntoa((*users)[user_data->fd].get_address()->sin_addr));
-
-					//若监测到读事件，将该事件放入请求队列
-					server->m_pool->append_p(*users + user_data->fd);
-
-					while (!(*users)[user_data->fd].available_to_write) {}
-					(*users)[user_data->fd].available_to_write = false;
-					if ((*users)[user_data->fd].bytes_to_send) {
-						add_socket_writev(&ring, user_data->fd, 0);
-					}
-					else if ((*users)[user_data->fd].m_linger && errno == EAGAIN)
-					{
-						add_socket_recv(&ring, user_data->fd, 0);
-					}
-					else add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0);
-
-					if ((*users_timer)[user_data->fd].timer_exist)
-					{
-						server->adjust_timer(timer);
-					}
-				}
-			}
-			else if (type == WRITE) {
-				int	ret = cqe->res;
-				io_uring_cqe_seen(&ring, cqe);
-				if (server->m_DebugMode) {
-					printf("Returned from WRITE is %d\n", ret);
-				}
-				util_timer* timer = (*users_timer)[user_data->fd].timer;
-
-				//printf("Bytes to send is %d\n",(*users)[user_data->fd].bytes_to_send);
-				//printf("Bytes have send is %d\n",(*users)[user_data->fd].bytes_have_send);
-				if (ret == -32) {
-					add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0);
-					if ((*users_timer)[user_data->fd].timer_exist) {
-						server->deal_timer(timer, user_data->fd);
-					}
-					else close(user_data->fd);
-				}
-				else if (ret == -11) {
-					add_socket_writev(&ring, user_data->fd, 0);
-				}
-				else if (ret == -14) {
-					add_socket_recv(&ring, user_data->fd, 0);
-				}
-				else if ((*users)[user_data->fd].bytes_to_send <= 0) {
-					LOG_INFO("send data to the client(%s)", inet_ntoa((*users)[user_data->fd].get_address()->sin_addr));
-					if ((*users)[user_data->fd].m_linger) {
-						(*users)[user_data->fd].init();
-						if ((*users_timer)[user_data->fd].timer_exist)
-						{
-							server->adjust_timer(timer);
-						}
-					}
-					else
-					{
-						if ((*users_timer)[user_data->fd].timer_exist) {
-							server->deal_timer(timer, user_data->fd);
-						}
-						else close(user_data->fd);
-					}
-					(*users)[user_data->fd].unmap();
-					add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0);
-					add_socket_recv(&ring, user_data->fd, 0);
-				}
-				else
-				{
-					(*users)[user_data->fd].bytes_have_send += ret;
-					(*users)[user_data->fd].bytes_to_send -= ret;
-					if ((*users)[user_data->fd].bytes_have_send >= (*users)[user_data->fd].m_iv[0].iov_len) //已发送完一个缓冲区的内容
-					{
-						(*users)[user_data->fd].m_iv[0].iov_len = 0; //重置第一个缓冲区长度
-						(*users)[user_data->fd].m_iv[1].iov_base = (*users)[user_data->fd].m_file_address
-							+ ((*users)[user_data->fd].bytes_have_send - (*users)[user_data->fd].m_write_idx); //设置第二个缓冲区地址
-						(*users)[user_data->fd].m_iv[1].iov_len = (*users)[user_data->fd].bytes_to_send;
-					}
-					else //否则继续发送
-					{
-						(*users)[user_data->fd].m_iv[0].iov_base = (*users)[user_data->fd].m_write_buf + (*users)[user_data->fd].bytes_have_send; //重新设置第一个缓冲区地址
-						(*users)[user_data->fd].m_iv[0].iov_len = (*users)[user_data->fd].m_iv[0].iov_len - (*users)[user_data->fd].bytes_have_send;
-					}
-					add_socket_writev(&ring, user_data->fd, 0);
-				}
-			}
-			else if (type == ACCEPT) {
+			if (type == ACCEPT) {
 				int sock_conn_fd = cqe->res;
 				//cqe向前移动避免当前请求避免被二次处理，Must be called after io_uring_{peek,wait}_cqe() after the cqe has been processed by the application.
 				io_uring_cqe_seen(&ring, cqe);
 				if (server->m_DebugMode) {
 					printf("Returned from ACCEPT is %d\n", sock_conn_fd);
 				}
+				/*if (sock_conn_fd <= 0) {
+					//add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0); 
+					continue;
+				}*/
 				if (sock_conn_fd <= 0) {
-					if (cqe_count - i <= 1) {
+					if (cqe_count - i == 1) {
 						goto newone;
 					}
 					else continue;
@@ -369,7 +288,91 @@ void iorws::IO_eventLoop()
 				}
 				server->timer(sock_conn_fd, client_addr);
 				add_socket_recv(&ring, sock_conn_fd, 0); //对该连接套接字添加读取
-			newone:add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0); //再继续对监听套接字添加监听
+				newone:add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0); 
+				//再继续对监听套接字添加监听
+			}
+			else if (type == READ) {
+				int bytes_have_read = cqe->res;
+				io_uring_cqe_seen(&ring, cqe);
+				if (server->m_DebugMode) {
+					printf("Returned from READ is %d\n", bytes_have_read);
+				}
+				util_timer* timer = (*users_timer)[user_data->fd].timer;
+				(*users)[user_data->fd].m_read_idx += bytes_have_read;
+
+				if(bytes_have_read > 0) {
+					LOG_INFO("deal with the client(%s)", 
+						inet_ntoa((*users)[user_data->fd].get_address()->sin_addr));
+
+					//若监测到读事件，将该事件放入请求队列
+					server->m_pool->append_p(*users + user_data->fd);
+
+					while (!(*users)[user_data->fd].available_to_write) {}
+					(*users)[user_data->fd].available_to_write = false;
+					add_socket_writev(&ring, user_data->fd, 0);
+
+					if ((*users_timer)[user_data->fd].timer_exist)
+					{
+						server->adjust_timer(timer);
+					}
+				}
+				else {
+					if (server->m_DebugMode) {
+						printf("closing...\n");
+						printf("the read idx is %d\n", (*users)[user_data->fd].m_read_idx);
+					}
+					if ((*users_timer)[user_data->fd].timer_exist) {
+						server->deal_timer(timer, user_data->fd);
+					}
+					else close(user_data->fd);
+					add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0);
+				}
+
+			}
+			else if (type == WRITE) {
+				int	ret = cqe->res;
+				io_uring_cqe_seen(&ring, cqe);
+				//assert(ret >= 0);
+				if (server->m_DebugMode) {
+					printf("Returned from WRITE is %d\n", ret);
+					printf("Bytes to send is %d\n",(*users)[user_data->fd].bytes_to_send);
+					printf("Bytes have send is %d\n",(*users)[user_data->fd].bytes_have_send);
+				}
+				util_timer* timer = (*users_timer)[user_data->fd].timer;
+				if (ret == -11) {
+					add_socket_writev(&ring, user_data->fd, 0);
+					continue;
+				}
+
+				if ((*users)[user_data->fd].bytes_to_send <= 0) {
+					LOG_INFO("send data to the client(%s)", 
+						inet_ntoa((*users)[user_data->fd].get_address()->sin_addr));
+					if ((*users)[user_data->fd].m_linger) {
+						(*users)[user_data->fd].init();
+						if ((*users_timer)[user_data->fd].timer_exist)
+						{
+							server->adjust_timer(timer);
+						}
+						add_socket_recv(&ring, user_data->fd, 0);
+					}
+					else
+					{
+						if (server->m_DebugMode) {
+							printf("closing fd%d...\n", user_data->fd);
+						}
+						if ((*users_timer)[user_data->fd].timer_exist) {
+							server->deal_timer(timer, user_data->fd);
+						}
+						else close(user_data->fd);
+					}
+					(*users)[user_data->fd].unmap();
+					add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0);
+				}
+				else
+				{
+					deal_with_write(*users, user_data->fd, ret);
+					add_socket_writev(&ring, user_data->fd, 0);
+				}
 			}
 		}
 		time_t new_time = time(NULL);
