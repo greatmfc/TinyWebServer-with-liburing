@@ -23,6 +23,7 @@ public:
 	void IO_eventLoop();
 	int init_registerfiles(void);
 	void deal_with_write(http_conn* user, unsigned int fd, int result);
+	static void sig_handler(int signo);
 
 public:
 	WebServer* server;

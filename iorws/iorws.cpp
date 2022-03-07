@@ -5,6 +5,7 @@ iorws::iorws(WebServer* ser) : server(ser)
 	int ret;
 	registerfiles = 1;
 	memset(&params, 0, sizeof(params));
+	//params.flags = IORING_SETUP_IOPOLL;
 	if (io_uring_queue_init_params(QUEUE_DEPTH, &ring, &params) < 0) { //初始化队列深度并根据param设置ring的参数
 		perror("io_uring_init_failed...\n");
 		exit(1);
@@ -164,6 +165,12 @@ void iorws::deal_with_write(http_conn* user, unsigned int fd, int result)
 	}
 }
 
+void iorws::sig_handler(int signo)
+{
+	cout << "Shutting down...\n";
+	exit(0);
+}
+
 void iorws::IO_eventListen()
 {
 	server->m_listenfd = socket(PF_INET, SOCK_STREAM, 0); 
@@ -230,6 +237,7 @@ void iorws::IO_eventLoop()
 
 	add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0);
 	time_t saved_time = time(NULL);
+	signal(SIGINT, sig_handler);
 	while (1)
 	{
 		int cqe_count;
