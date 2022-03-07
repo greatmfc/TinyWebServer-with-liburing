@@ -2,7 +2,7 @@
 
 ## 简介
 
-本项目是基于[TinyWebServer](https://github.com/qinguoyi/TinyWebServer)使用axboe封装的[liburing](https://github.com/axboe/liburing)库对项目中的epoll IO进行了替换和重写，初步实现linux下的proactor。
+本项目是基于[TinyWebServer](https://github.com/qinguoyi/TinyWebServer)使用axboe封装的[liburing](https://github.com/axboe/liburing)库对项目中的epoll IO进行了替换和重写，初步实现linux下的异步I/O服务器。
 
 对liburing库的使用参考了该[io_uring-echo-server](https://github.com/frevib/io_uring-echo-server)的模型。
 
@@ -24,11 +24,11 @@
 make test
 ```
 
-详细介绍见：iorws类细节介绍
+详细介绍见：[iorws类细节介绍](./iorws/iorws类细节介绍.md)
 
-[iorws类细节介绍]: ./iorws类细节介绍.md
+使用方式：
 
-
+输入`make`后运行server文件。
 
 （20220306）其他内容与原项目基本一致。
 
@@ -43,6 +43,8 @@ make test
 ~~在wsl2上运行会出现无法分配内存的错误，需要使用sudo命令或root用户运行程序，虚拟机系统可正常运行。~~
 
 （20220306）使用webbench进行压力测试会有大量的failed，并在测试后直接错误跳出，errno为16。
+
+（20220307）通过改变io_uring队列深度和系统文件描述符上限可以解决压力测试问题，但是会大量使用系统资源。
 
 ## 性能对比
 
