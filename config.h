@@ -42,6 +42,8 @@ public:
 
     //并发模型选择
     int actor_model;
+
+    int unlimit_file;
 };
 
 #endif

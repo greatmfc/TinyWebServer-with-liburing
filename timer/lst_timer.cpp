@@ -173,7 +173,7 @@ void Utils::addfd(int epollfd, int fd, bool one_shot, int TRIGMode)
     if (one_shot)
         event.events |= EPOLLONESHOT;
     epoll_ctl(epollfd, EPOLL_CTL_ADD, fd, &event);
-    setnonblocking(fd);
+    //setnonblocking(fd);
 }
 
 //信号处理函数，作用是把信号传输到管道的写端
@@ -203,7 +203,7 @@ void Utils::addsig(int sig, void(handler)(int), bool restart)
 void Utils::timer_handler()
 {
     m_timer_lst.tick();
-    alarm(m_TIMESLOT); //设置时隙为超时时间
+    //alarm(m_TIMESLOT); //设置时隙为超时时间
 }
 
 void Utils::show_error(int connfd, const char *info)

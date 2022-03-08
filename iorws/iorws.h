@@ -9,7 +9,8 @@
 #define BACKLOG 8192
 #define IORING_FEAT_FAST_POLL (1U << 5)
 constexpr auto WAIT_TIME = 0xffffff;
-constexpr auto QUEUE_DEPTH = 512;
+constexpr auto QUEUE_DEPTH = 32768;
+constexpr auto LISTEN_BACKLOG = 128;
 
 class iorws
 {
@@ -31,12 +32,14 @@ public:
 	client_data** users_timer;
 	Utils* utils;
 	int m_pipefd[2];
+	int uf;
 
 private:
 	struct io_uring_params params;
 	struct io_uring ring;
 	int registerfiles; //是否开启寄存文件功能
 	int *registered_files; //寄存文件数组
+	int qd = QUEUE_DEPTH;
 
 	enum {
 		ACCEPT,

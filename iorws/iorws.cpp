@@ -2,13 +2,15 @@
 
 iorws::iorws(WebServer* ser) : server(ser)
 {
-	int ret;
 	registerfiles = 1;
 	memset(&params, 0, sizeof(params));
 	//params.flags = IORING_SETUP_IOPOLL;
 	if (io_uring_queue_init_params(QUEUE_DEPTH, &ring, &params) < 0) { //初始化队列深度并根据param设置ring的参数
-		perror("io_uring_init_failed...\n");
-		exit(1);
+		if (io_uring_queue_init_params(512, &ring, &params) < 0) {
+			perror("io_uring_init_failed when queue depth is 512\n");
+			exit(1);
+		}
+		else qd = 512;
 	}
 
 	if (!(params.features & IORING_FEAT_FAST_POLL)) {
@@ -17,11 +19,6 @@ iorws::iorws(WebServer* ser) : server(ser)
 		exit(0);
 	}
 
-	if (registerfiles) {
-		ret = init_registerfiles(); //初始化文件描述符和寄存器文件描述符，正常返回0
-		if (ret)
-			return;
-	}
 	conns = (conn_info*)calloc(sizeof(conn_info), 65536);
 	if (!conns) {
 		fprintf(stderr, "allocate conns failed");
@@ -112,8 +109,10 @@ int iorws::init_registerfiles(void)
 	int i, ret;
 
 	ret = getrlimit(RLIMIT_NOFILE, &r); //获取进程能打开的最大文件描述符数和当前的软限制文件描述符数
-	//r.rlim_cur = 31440;
-	//setrlimit(RLIMIT_NOFILE, &r);
+	if (uf) {
+		r.rlim_cur = 31440;
+		setrlimit(RLIMIT_NOFILE, &r);
+	}
 	if (ret < 0) {
 		fprintf(stderr, "getrlimit: %s\n", strerror(errno)); //stderror是通过参数errno，返回错误信息
 		return ret;
@@ -126,6 +125,7 @@ int iorws::init_registerfiles(void)
 		r.rlim_max = 32768;
 	if (server->m_DebugMode) {
 		printf("number of registered files: %ld\n", r.rlim_max);
+		printf("queue depth is: %ld\n", qd);
 	}
 
 	registered_files = (int* )calloc(r.rlim_max, sizeof(int));
@@ -167,12 +167,19 @@ void iorws::deal_with_write(http_conn* user, unsigned int fd, int result)
 
 void iorws::sig_handler(int signo)
 {
-	cout << "Shutting down...\n";
+	cout << "\rShutting down...\n";
 	exit(0);
 }
 
 void iorws::IO_eventListen()
 {
+	int ret;
+	if (registerfiles) {
+		ret = init_registerfiles(); //初始化文件描述符和寄存器文件描述符，正常返回0
+		if (ret)
+			return;
+	}
+
 	server->m_listenfd = socket(PF_INET, SOCK_STREAM, 0); 
 	//对于BSD是AF，对于POSIX是PF；设置IPV4因特网域，设置有序的可靠的面向连接的字节流，设置默认的域，返回套接字描述符
 	assert(server->m_listenfd >= 0); //出错时打印错误条件、文件名和出错行数
@@ -189,7 +196,7 @@ void iorws::IO_eventListen()
 		struct linger tmp = {1, 1}; //这种方式下，在调用closesocket的时候不会立刻返回，内核会延迟一段时间，这个时间就由l_linger的值来决定。
 		setsockopt(server->m_listenfd, SOL_SOCKET, SO_LINGER, &tmp, sizeof(tmp));
 	}
-	int ret = 0; //返回值
+
 	struct sockaddr_in address; //ipv4结构
 	bzero(&address, sizeof(address)); //将所指地址的前n个字节清零
 	address.sin_family = AF_INET; //IPV4
@@ -201,20 +208,13 @@ void iorws::IO_eventListen()
 	setsockopt(server->m_listenfd, SOL_SOCKET, SO_REUSEADDR, &flag, sizeof(flag)); //SO_REUSEADDR表示如果*val非0则重用bind中的地址
 	ret = bind(server->m_listenfd, (struct sockaddr *)&address, sizeof(address)); //关联地址和套接字，该函数只接受sockaddr类型的指针
 	assert(ret >= 0);
-	ret = listen(server->m_listenfd, 5); //参数backlog提供了一个提示，提示系统该进程所要入队的未完成连接请求数量，若无错误则返回0
+	ret = listen(server->m_listenfd, LISTEN_BACKLOG); //参数backlog提供了一个提示，提示系统该进程所要入队的未完成连接请求数量，若无错误则返回0
 	assert(ret >= 0);
 	utils->init(TIMESLOT); //初始化计时器的时隙
 
 	//创建一对无命名的、相互连接的UNIX域套接字，可作为全双工管道使用，该管道主要用于信号的接收和传输，全双工是为了高并发
 	ret = socketpair(PF_UNIX, SOCK_STREAM, 0, m_pipefd); 
 	assert(ret != -1);
-	server->utils.setnonblocking(m_pipefd[1]); //写端无阻塞
-	server->utils.addsig(SIGPIPE, SIG_IGN); //在管道的读进程已终止后，一个进程写此管道则产生SIGPIPE信号；SIG_IGN指忽略此信号，SIG_IGN是一个处理函数
-	server->utils.addsig(SIGALRM, utils->sig_handler, false); //把信号传递到管道的写端
-	server->utils.addsig(SIGTERM, utils->sig_handler, false);
-	alarm(TIMESLOT); //设置超时
-
-	server->utils.u_pipefd = m_pipefd; //让定时器也能够通过该管道传输信号给进程
 
 	if (registerfiles) {
 		ret = io_uring_register_files_update(&ring, server->m_listenfd,
@@ -256,6 +256,9 @@ void iorws::IO_eventLoop()
 		assert(cqe_count >= 0);
 		if (cqe_count==0) {
 			add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0);
+			if (server->m_DebugMode) {
+				printf("Returned from cqe_count is %d\n", cqe_count);
+			}
 			continue;
 		}
 		if (server->m_DebugMode) {
@@ -274,16 +277,16 @@ void iorws::IO_eventLoop()
 				if (server->m_DebugMode) {
 					printf("Returned from ACCEPT is %d\n", sock_conn_fd);
 				}
-				/*if (sock_conn_fd <= 0) {
+				if (sock_conn_fd <= 0) {
 					//add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0); 
 					continue;
-				}*/
-				if (sock_conn_fd <= 0) {
+				}
+				/*if (sock_conn_fd <= 0) {
 					if (cqe_count - i == 1) {
 						goto newone;
 					}
 					else continue;
-				}
+				}*/
 
 				if (registerfiles && registered_files[sock_conn_fd] == -1) { //寄存文件中并没有注册该连接套接字
 					ret = io_uring_register_files_update(&ring, sock_conn_fd, &sock_conn_fd, 1); //重新将该套接字加入到寄存器文件中，减少反复读取

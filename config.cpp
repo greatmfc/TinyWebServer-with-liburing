@@ -30,11 +30,13 @@ Config::Config(){
 
     //并发模型,默认是proactor
     actor_model = 0;
+
+    unlimit_file = 0;
 }
 
 void Config::parse_arg(int argc, char*argv[]){
     int opt;
-    const char *str = "p:l:d:o:s:t:c:a:";
+    const char *str = "p:l:d:o:s:t:c:a:u:";
     while ((opt = getopt(argc, argv, str)) != -1) //不断迭代进行参数分析
     {
         switch (opt)
@@ -77,6 +79,11 @@ void Config::parse_arg(int argc, char*argv[]){
         case 'a':
         {
             actor_model = atoi(optarg);
+            break;
+        }
+        case 'u':
+        {
+            unlimit_file = atoi(optarg);
             break;
         }
         default:

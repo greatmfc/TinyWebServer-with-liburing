@@ -13,6 +13,7 @@ int main(int argc, char *argv[])
 
     static WebServer server;
     iorws iorws(&server);
+    iorws.uf = config.unlimit_file;
 
     //初始化
     server.init(config.PORT, user, passwd, databasename, config.LOGWrite, 
