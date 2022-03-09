@@ -4,7 +4,7 @@ iorws::iorws(WebServer* ser) : server(ser)
 {
 	registerfiles = 1;
 	memset(&params, 0, sizeof(params));
-	//params.flags = IORING_SETUP_IOPOLL;
+	//params.flags = IORING_SETUP_SQPOLL;
 	if (io_uring_queue_init_params(QUEUE_DEPTH, &ring, &params) < 0) { //初始化队列深度并根据param设置ring的参数
 		if (io_uring_queue_init_params(512, &ring, &params) < 0) {
 			perror("io_uring_init_failed when queue depth is 512\n");
@@ -117,13 +117,13 @@ int iorws::init_registerfiles(void)
 		fprintf(stderr, "getrlimit: %s\n", strerror(errno)); //stderror是通过参数errno，返回错误信息
 		return ret;
 	}
-	else if (server->m_DebugMode) {
+	else if (debug) {
 		printf("RLIMIT_NOFILE: %ld %ld\n", r.rlim_cur, r.rlim_max); //输出限制数
 	}
 
 	if (r.rlim_max > 32768)
 		r.rlim_max = 32768;
-	if (server->m_DebugMode) {
+	if (debug) {
 		printf("number of registered files: %ld\n", r.rlim_max);
 		printf("queue depth is: %ld\n", qd);
 	}
@@ -173,6 +173,7 @@ void iorws::sig_handler(int signo)
 
 void iorws::IO_eventListen()
 {
+	debug = server->m_DebugMode;
 	int ret;
 	if (registerfiles) {
 		ret = init_registerfiles(); //初始化文件描述符和寄存器文件描述符，正常返回0
@@ -253,15 +254,8 @@ void iorws::IO_eventLoop()
 
 		//将准备好的队列填充到cqes中，并返回已准备好的数目，收割cqe
 		cqe_count = io_uring_peek_batch_cqe(&ring, cqes, sizeof(cqes) / sizeof(cqes[0]));
-		assert(cqe_count >= 0);
-		if (cqe_count==0) {
-			add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0);
-			if (server->m_DebugMode) {
-				printf("Returned from cqe_count is %d\n", cqe_count);
-			}
-			continue;
-		}
-		if (server->m_DebugMode) {
+		assert(cqe_count > 0);
+		if (debug) {
 			printf("Returned from cqe_count is %d\n", cqe_count);
 		}
 
@@ -274,19 +268,12 @@ void iorws::IO_eventLoop()
 				int sock_conn_fd = cqe->res;
 				//cqe向前移动避免当前请求避免被二次处理，Must be called after io_uring_{peek,wait}_cqe() after the cqe has been processed by the application.
 				io_uring_cqe_seen(&ring, cqe);
-				if (server->m_DebugMode) {
+				if (debug) {
 					printf("Returned from ACCEPT is %d\n", sock_conn_fd);
 				}
 				if (sock_conn_fd <= 0) {
-					//add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0); 
 					continue;
 				}
-				/*if (sock_conn_fd <= 0) {
-					if (cqe_count - i == 1) {
-						goto newone;
-					}
-					else continue;
-				}*/
 
 				if (registerfiles && registered_files[sock_conn_fd] == -1) { //寄存文件中并没有注册该连接套接字
 					ret = io_uring_register_files_update(&ring, sock_conn_fd, &sock_conn_fd, 1); //重新将该套接字加入到寄存器文件中，减少反复读取
@@ -299,13 +286,13 @@ void iorws::IO_eventLoop()
 				}
 				server->timer(sock_conn_fd, client_addr);
 				add_socket_recv(&ring, sock_conn_fd, 0); //对该连接套接字添加读取
-				newone:add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0); 
+				add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0); 
 				//再继续对监听套接字添加监听
 			}
 			else if (type == READ) {
 				int bytes_have_read = cqe->res;
 				io_uring_cqe_seen(&ring, cqe);
-				if (server->m_DebugMode) {
+				if (debug) {
 					printf("Returned from READ is %d\n", bytes_have_read);
 				}
 				util_timer* timer = (*users_timer)[user_data->fd].timer;
@@ -328,9 +315,8 @@ void iorws::IO_eventLoop()
 					}
 				}
 				else {
-					if (server->m_DebugMode) {
-						printf("closing...\n");
-						printf("the read idx is %d\n", (*users)[user_data->fd].m_read_idx);
+					if (debug) {
+						printf("closing by READ: fd%d...\n", user_data->fd);
 					}
 					if ((*users_timer)[user_data->fd].timer_exist) {
 						server->deal_timer(timer, user_data->fd);
@@ -338,20 +324,18 @@ void iorws::IO_eventLoop()
 					else close(user_data->fd);
 					add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0);
 				}
-
 			}
 			else if (type == WRITE) {
 				int	ret = cqe->res;
 				io_uring_cqe_seen(&ring, cqe);
-				//assert(ret >= 0);
-				if (server->m_DebugMode) {
+				if (debug) {
 					printf("Returned from WRITE is %d\n", ret);
 					printf("Bytes to send is %d\n",(*users)[user_data->fd].bytes_to_send);
 					printf("Bytes have send is %d\n",(*users)[user_data->fd].bytes_have_send);
 				}
 				util_timer* timer = (*users_timer)[user_data->fd].timer;
-				if (ret == -11) {
-					add_socket_writev(&ring, user_data->fd, 0);
+				if (ret < 0) {
+					if(ret == -11) add_socket_writev(&ring, user_data->fd, 0);
 					continue;
 				}
 
@@ -368,8 +352,8 @@ void iorws::IO_eventLoop()
 					}
 					else
 					{
-						if (server->m_DebugMode) {
-							printf("closing fd%d...\n", user_data->fd);
+						if (debug) {
+							printf("closing by WRITE: fd%d...\n", user_data->fd);
 						}
 						if ((*users_timer)[user_data->fd].timer_exist) {
 							server->deal_timer(timer, user_data->fd);
@@ -378,6 +362,7 @@ void iorws::IO_eventLoop()
 					}
 					(*users)[user_data->fd].unmap();
 					add_accept(&ring, server->m_listenfd, (struct sockaddr*)&client_addr, &client_len, 0);
+					//如果关闭后不添加accept会导致重用处在CLOSE_WAIT状态的文件描述符导致无法读写
 				}
 				else
 				{

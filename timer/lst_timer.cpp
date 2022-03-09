@@ -221,6 +221,13 @@ void cb_func(client_data *user_data)
     //epoll_ctl(Utils::u_epollfd, EPOLL_CTL_DEL, user_data->sockfd, 0); //从列表中删除该描述符
     assert(user_data); //检验该连接是否有效，无效则终止程序执行
     user_data->timer_exist = false;
-    close(user_data->sockfd);
+    int ret = close(user_data->sockfd);
+    /*if (ret != 0) {
+        fprintf(stderr, "return from close is %d\n", ret);
+        fprintf(stderr, "errno is %d\n", errno);
+    	perror("close fail\n");
+        assert(ret == 0);
+	    throw -1;
+    }*/
     http_conn::m_user_count--;
 }

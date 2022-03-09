@@ -40,6 +40,7 @@ private:
 	int registerfiles; //是否开启寄存文件功能
 	int *registered_files; //寄存文件数组
 	int qd = QUEUE_DEPTH;
+	bool debug;
 
 	enum {
 		ACCEPT,
