@@ -254,7 +254,7 @@ void iorws::IO_eventLoop()
 
 		//将准备好的队列填充到cqes中，并返回已准备好的数目，收割cqe
 		cqe_count = io_uring_peek_batch_cqe(&ring, cqes, sizeof(cqes) / sizeof(cqes[0]));
-		assert(cqe_count > 0);
+		assert(cqe_count >= 0);
 		if (debug) {
 			printf("Returned from cqe_count is %d\n", cqe_count);
 		}
