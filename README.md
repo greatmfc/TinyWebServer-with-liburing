@@ -6,6 +6,8 @@
 
 对liburing库的使用参考了该[io_uring-echo-server](https://github.com/frevib/io_uring-echo-server)的模型。
 
+（20220313）更多详细对比见[epoll与io_uring](https://juejin.cn/post/7074212680071905311)
+
 ## 内容介绍
 
 本项目重写的主要内容在iorws文件夹中，使用新增的iorws类在main.cpp文件中替换了原webserver类的event_Listen和event_Loop两个函数进行主进程的运行。
@@ -48,13 +50,15 @@ make test
 
 ~~（20220306）使用webbench进行压力测试会有大量的failed，并在测试后直接错误跳出，errno为16。~~
 
-（20220307）通过改变io_uring队列深度和系统文件描述符上限可以解决压力测试问题，但是会大量使用系统资源。
+~~（20220307）通过改变io_uring队列深度和系统文件描述符上限可以解决压力测试问题，但是会大量使用系统资源。~~
+
+（20220312）关闭寄存器文件选项可避免大量failed，但性能会大幅下降。
 
 ## 性能对比
 
 系统环境：wsl2，内核版本5.10.60.1，发行版为Debian
 
-硬件：I5-9400
+硬件：I5-9400,16gDDR4
 
 ### 原webserver设置双ET+不开启日志
 
@@ -65,6 +69,8 @@ make test
 ![image-20220202232755537](./root/image-20220202232755537.png)
 
 由于优化问题，使用了`io_uring`的webserver在性能上与epoll相比略有优势，可以看得到`io_uring`在网络编程上的可行性和潜力所在。
+
+(20220312)最新测试数据见[benchmark](./benchmark-photo/readme.md)
 
 ## 线程版webbench
 

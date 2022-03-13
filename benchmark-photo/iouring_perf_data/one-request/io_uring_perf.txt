@@ -1,0 +1,524 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 551  of event 'cpu-clock:uhpppH'
+# Event count (approx.): 5565656510
+#
+# Children      Self  Command  Shared Object     Symbol                
+# ........  ........  .......  ................  ......................
+#
+    96.37%     0.00%  server   [unknown]         [.] 0x5541d68949564100
+            |
+            ---0x5541d68949564100
+               0x7f1529d8ed0a
+               0x558d2f805bdf
+               |          
+               |--74.23%--0x7f1529e609b9
+               |          
+               |--5.26%--0x558d2f8111bd
+               |          |          
+               |           --5.08%--0x558d2f80fb91
+               |                     |          
+               |                     |--3.81%--0x558d2f80fb66
+               |                     |          |          
+               |                     |           --3.09%--0x558d2f811623
+               |                     |                     |          
+               |                     |                      --2.54%--0x558d2f8116d9
+               |                     |          
+               |                      --0.54%--0x558d2f8115fe
+               |          
+               |--2.90%--0x558d2f811568
+               |          |          
+               |           --1.09%--0x558d2f81028e
+               |                     |          
+               |                      --0.91%--0x558d2f80fcd1
+               |          
+               |--2.54%--0x558d2f8112bc
+               |          |          
+               |           --0.54%--0x558d2f81028e
+               |                     0x558d2f80fcd1
+               |          
+               |--1.27%--0x558d2f810c8c
+               |          
+               |--1.09%--0x7f152a188bd2
+               |          
+               |--0.91%--0x7f152a188bd4
+               |          
+               |--0.91%--0x558d2f81153e
+               |          
+                --0.73%--0x558d2f810c81
+                          |          
+                           --0.54%--0x558d2f80fbbe
+
+    96.37%     0.00%  server   libc-2.31.so      [.] 0x00007f1529d8ed0a
+            |
+            ---0x7f1529d8ed0a
+               0x558d2f805bdf
+               |          
+               |--74.23%--0x7f1529e609b9
+               |          
+               |--5.26%--0x558d2f8111bd
+               |          |          
+               |           --5.08%--0x558d2f80fb91
+               |                     |          
+               |                     |--3.81%--0x558d2f80fb66
+               |                     |          |          
+               |                     |           --3.09%--0x558d2f811623
+               |                     |                     |          
+               |                     |                      --2.54%--0x558d2f8116d9
+               |                     |          
+               |                      --0.54%--0x558d2f8115fe
+               |          
+               |--2.90%--0x558d2f811568
+               |          |          
+               |           --1.09%--0x558d2f81028e
+               |                     |          
+               |                      --0.91%--0x558d2f80fcd1
+               |          
+               |--2.54%--0x558d2f8112bc
+               |          |          
+               |           --0.54%--0x558d2f81028e
+               |                     0x558d2f80fcd1
+               |          
+               |--1.27%--0x558d2f810c8c
+               |          
+               |--1.09%--0x7f152a188bd2
+               |          
+               |--0.91%--0x7f152a188bd4
+               |          
+               |--0.91%--0x558d2f81153e
+               |          
+                --0.73%--0x558d2f810c81
+                          |          
+                           --0.54%--0x558d2f80fbbe
+
+    96.37%     0.00%  server   server            [.] 0x0000558d2f805bdf
+            |
+            ---0x558d2f805bdf
+               |          
+               |--74.23%--0x7f1529e609b9
+               |          
+               |--5.26%--0x558d2f8111bd
+               |          |          
+               |           --5.08%--0x558d2f80fb91
+               |                     |          
+               |                     |--3.81%--0x558d2f80fb66
+               |                     |          |          
+               |                     |           --3.09%--0x558d2f811623
+               |                     |                     |          
+               |                     |                      --2.54%--0x558d2f8116d9
+               |                     |          
+               |                      --0.54%--0x558d2f8115fe
+               |          
+               |--2.90%--0x558d2f811568
+               |          |          
+               |           --1.09%--0x558d2f81028e
+               |                     |          
+               |                      --0.91%--0x558d2f80fcd1
+               |          
+               |--2.54%--0x558d2f8112bc
+               |          |          
+               |           --0.54%--0x558d2f81028e
+               |                     0x558d2f80fcd1
+               |          
+               |--1.27%--0x558d2f810c8c
+               |          
+               |--1.09%--0x7f152a188bd2
+               |          
+               |--0.91%--0x7f152a188bd4
+               |          
+               |--0.91%--0x558d2f81153e
+               |          
+                --0.73%--0x558d2f810c81
+                          |          
+                           --0.54%--0x558d2f80fbbe
+
+    74.23%    74.23%  server   libc-2.31.so      [.] 0x00000000000f89b9
+            |
+            ---0x5541d68949564100
+               0x7f1529d8ed0a
+               0x558d2f805bdf
+               0x7f1529e609b9
+
+    74.23%     0.00%  server   libc-2.31.so      [.] 0x00007f1529e609b9
+            |
+            ---0x7f1529e609b9
+
+     5.26%     0.00%  server   server            [.] 0x0000558d2f8111bd
+            |
+            ---0x558d2f8111bd
+               |          
+                --5.08%--0x558d2f80fb91
+                          |          
+                          |--3.81%--0x558d2f80fb66
+                          |          |          
+                          |           --3.09%--0x558d2f811623
+                          |                     |          
+                          |                      --2.54%--0x558d2f8116d9
+                          |          
+                           --0.54%--0x558d2f8115fe
+
+     5.08%     0.00%  server   server            [.] 0x0000558d2f80fb91
+            |
+            ---0x558d2f80fb91
+               |          
+               |--3.81%--0x558d2f80fb66
+               |          |          
+               |           --3.09%--0x558d2f811623
+               |                     |          
+               |                      --2.54%--0x558d2f8116d9
+               |          
+                --0.54%--0x558d2f8115fe
+
+     3.81%     0.00%  server   server            [.] 0x0000558d2f80fb66
+            |
+            ---0x558d2f80fb66
+               |          
+                --3.09%--0x558d2f811623
+                          |          
+                           --2.54%--0x558d2f8116d9
+
+     3.09%     0.00%  server   server            [.] 0x0000558d2f811623
+            |
+            ---0x558d2f811623
+               |          
+                --2.54%--0x558d2f8116d9
+
+     2.90%     0.00%  server   server            [.] 0x0000558d2f811568
+            |
+            ---0x558d2f811568
+               |          
+                --1.09%--0x558d2f81028e
+                          |          
+                           --0.91%--0x558d2f80fcd1
+
+     2.90%     0.00%  server   [unknown]         [.] 0000000000000000
+            |
+            ---0
+               |          
+               |--1.81%--0x7f152a191040
+               |          |          
+               |          |--0.91%--0x7f152a188d3d
+               |          |          
+               |           --0.54%--0x7f152a188d10
+               |          
+                --0.73%--0xfffffff5
+                          0
+
+     2.54%     2.54%  server   server            [.] 0x000000000000f6d9
+            |
+            ---0x5541d68949564100
+               0x7f1529d8ed0a
+               0x558d2f805bdf
+               0x558d2f8111bd
+               0x558d2f80fb91
+               0x558d2f80fb66
+               0x558d2f811623
+               0x558d2f8116d9
+
+     2.54%     0.00%  server   server            [.] 0x0000558d2f8112bc
+            |
+            ---0x558d2f8112bc
+               |          
+                --0.54%--0x558d2f81028e
+                          0x558d2f80fcd1
+
+     2.54%     0.00%  server   server            [.] 0x0000558d2f8116d9
+            |
+            ---0x558d2f8116d9
+
+     1.81%     0.00%  server   [unknown]         [.] 0x00007f152a191040
+            |
+            ---0x7f152a191040
+               |          
+               |--0.91%--0x7f152a188d3d
+               |          
+                --0.54%--0x7f152a188d10
+
+     1.63%     0.00%  server   server            [.] 0x0000558d2f81028e
+            |
+            ---0x558d2f81028e
+               |          
+                --1.45%--0x558d2f80fcd1
+
+     1.45%     0.00%  server   server            [.] 0x0000558d2f80fcd1
+            |
+            ---0x558d2f80fcd1
+
+     1.27%     1.27%  server   server            [.] 0x000000000000ec8c
+            |
+            ---0x5541d68949564100
+               0x7f1529d8ed0a
+               0x558d2f805bdf
+               0x558d2f810c8c
+
+     1.27%     0.00%  server   server            [.] 0x0000558d2f810c8c
+            |
+            ---0x558d2f810c8c
+
+     1.09%     1.09%  server   liburing.so.2.2   [.] 0x0000000000002bd2
+            |
+            ---0x5541d68949564100
+               0x7f1529d8ed0a
+               0x558d2f805bdf
+               0x7f152a188bd2
+
+     1.09%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188bd2
+            |
+            ---0x7f152a188bd2
+
+     0.91%     0.91%  server   liburing.so.2.2   [.] 0x0000000000002bd4
+            |
+            ---0x5541d68949564100
+               0x7f1529d8ed0a
+               0x558d2f805bdf
+               0x7f152a188bd4
+
+     0.91%     0.91%  server   liburing.so.2.2   [.] 0x0000000000002d3d
+            |
+            ---0
+               0x7f152a191040
+               0x7f152a188d3d
+
+     0.91%     0.00%  server   server            [.] 0x0000558d2f81153e
+            |
+            ---0x558d2f81153e
+
+     0.91%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188bd4
+            |
+            ---0x7f152a188bd4
+
+     0.91%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188d3d
+            |
+            ---0x7f152a188d3d
+
+     0.73%     0.73%  server   liburing.so.2.2   [.] 0x0000000000002c7a
+     0.73%     0.00%  server   [unknown]         [.] 0x0000000300000011
+            |
+            ---0x300000011
+               0xffffffe0
+               0x7f152a1911d0
+
+     0.73%     0.00%  server   [unknown]         [.] 0x00000000ffffffe0
+            |
+            ---0xffffffe0
+               0x7f152a1911d0
+
+     0.73%     0.00%  server   [unknown]         [.] 0x00000000fffffff5
+            |
+            ---0xfffffff5
+               0
+
+     0.73%     0.00%  server   server            [.] 0x0000558d2f810c81
+            |
+            ---0x558d2f810c81
+               |          
+                --0.54%--0x558d2f80fbbe
+
+     0.73%     0.00%  server   [unknown]         [.] 0x00007f152a1911d0
+            |
+            ---0x7f152a1911d0
+
+     0.73%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188c7a
+            |
+            ---0x7f152a188c7a
+
+     0.54%     0.54%  server   server            [.] 0x000000000000f5fe
+            |
+            ---0x5541d68949564100
+               0x7f1529d8ed0a
+               0x558d2f805bdf
+               0x558d2f8111bd
+               0x558d2f80fb91
+               0x558d2f8115fe
+
+     0.54%     0.54%  server   server            [.] 0x000000000000dbbe
+            |
+            ---0x5541d68949564100
+               0x7f1529d8ed0a
+               0x558d2f805bdf
+               0x558d2f810c81
+               0x558d2f80fbbe
+
+     0.54%     0.54%  server   liburing.so.2.2   [.] 0x0000000000002d10
+            |
+            ---0
+               0x7f152a191040
+               0x7f152a188d10
+
+     0.54%     0.00%  server   server            [.] 0x0000558d2f8102e8
+            |
+            ---0x558d2f8102e8
+
+     0.54%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188d10
+            |
+            ---0x7f152a188d10
+
+     0.54%     0.00%  server   server            [.] 0x0000558d2f80fbbe
+            |
+            ---0x558d2f80fbbe
+
+     0.54%     0.00%  server   server            [.] 0x0000558d2f8115fe
+            |
+            ---0x558d2f8115fe
+
+     0.36%     0.36%  server   server            [.] 0x000000000000dbff
+     0.36%     0.36%  server   server            [.] 0x000000000000f619
+     0.36%     0.36%  server   server            [.] 0x000000000000dbac
+     0.36%     0.36%  server   server            [.] 0x000000000000f625
+     0.36%     0.36%  server   liburing.so.2.2   [.] 0x0000000000002dbb
+     0.36%     0.36%  server   server            [.] 0x000000000000e567
+     0.36%     0.36%  server   libc-2.31.so      [.] 0x00000000000f89bf
+     0.36%     0.36%  server   libc-2.31.so      [.] 0x00000000000f89c1
+     0.36%     0.36%  server   liburing.so.2.2   [.] 0x0000000000002cec
+     0.36%     0.36%  server   server            [.] 0x000000000000eb27
+     0.36%     0.36%  server   server            [.] 0x000000000000ebb6
+     0.36%     0.36%  server   server            [.] 0x000000000000ec27
+     0.36%     0.36%  server   server            [.] 0x000000000000ec37
+     0.36%     0.36%  server   server            [.] 0x000000000000ec89
+     0.36%     0.36%  server   server            [.] 0x000000000000ee3a
+     0.36%     0.00%  server   server            [.] 0x0000558d2f81029f
+     0.36%     0.00%  server   libc-2.31.so      [.] 0x00007f1529e609bf
+     0.36%     0.00%  server   libc-2.31.so      [.] 0x00007f1529e609c1
+     0.36%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188cec
+     0.36%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188dbb
+     0.36%     0.00%  server   server            [.] 0x0000558d2f80fbac
+     0.36%     0.00%  server   server            [.] 0x0000558d2f80fbff
+     0.36%     0.00%  server   server            [.] 0x0000558d2f810567
+     0.36%     0.00%  server   server            [.] 0x0000558d2f810b27
+     0.36%     0.00%  server   server            [.] 0x0000558d2f810bb6
+     0.36%     0.00%  server   server            [.] 0x0000558d2f810c27
+     0.36%     0.00%  server   server            [.] 0x0000558d2f810c37
+     0.36%     0.00%  server   server            [.] 0x0000558d2f810c89
+     0.36%     0.00%  server   server            [.] 0x0000558d2f810e3a
+     0.36%     0.00%  server   server            [.] 0x0000558d2f811619
+     0.36%     0.00%  server   server            [.] 0x0000558d2f811625
+     0.18%     0.18%  server   server            [.] 0x000000000000f694
+     0.18%     0.18%  server   server            [.] 0x000000000000f6db
+     0.18%     0.18%  server   server            [.] 0x000000000000dbe8
+     0.18%     0.18%  server   server            [.] 0x000000000000dbf7
+     0.18%     0.18%  server   server            [.] 0x000000000000dc11
+     0.18%     0.18%  server   server            [.] 0x000000000000dc18
+     0.18%     0.18%  server   server            [.] 0x000000000000dc23
+     0.18%     0.18%  server   server            [.] 0x000000000000dc90
+     0.18%     0.18%  server   server            [.] 0x000000000000f602
+     0.18%     0.18%  server   server            [.] 0x000000000000f610
+     0.18%     0.18%  server   server            [.] 0x000000000000f623
+     0.18%     0.18%  server   server            [.] 0x000000000000db4e
+     0.18%     0.18%  server   server            [.] 0x000000000000db59
+     0.18%     0.18%  server   server            [.] 0x000000000000dba0
+     0.18%     0.18%  server   server            [.] 0x000000000000dbc8
+     0.18%     0.18%  server   server            [.] 0x000000000000dbd7
+     0.18%     0.18%  server   server            [.] 0x000000000000dcb3
+     0.18%     0.18%  server   liburing.so.2.2   [.] 0x0000000000002dc6
+     0.18%     0.18%  server   server            [.] 0x000000000000db79
+     0.18%     0.18%  server   server            [.] 0x000000000000dbbb
+     0.18%     0.18%  server   server            [.] 0x000000000000dbc0
+     0.18%     0.18%  server   server            [.] 0x000000000000e206
+     0.18%     0.18%  server   server            [.] 0x000000000000e20d
+     0.18%     0.18%  server   server            [.] 0x000000000000e22d
+     0.18%     0.18%  server   server            [.] 0x000000000000e240
+     0.18%     0.18%  server   server            [.] 0x000000000000e2a3
+     0.18%     0.18%  server   server            [.] 0x000000000000e2a9
+     0.18%     0.18%  server   server            [.] 0x000000000000e2ad
+     0.18%     0.18%  server   server            [.] 0x000000000000e2be
+     0.18%     0.18%  server   server            [.] 0x000000000000e2ca
+     0.18%     0.18%  server   server            [.] 0x000000000000e2ce
+     0.18%     0.18%  server   server            [.] 0x000000000000e4e7
+     0.18%     0.18%  server   server            [.] 0x000000000000e560
+     0.18%     0.18%  server   server            [.] 0x000000000000e5b5
+     0.18%     0.18%  server   liburing.so.2.2   [.] 0x0000000000002bd3
+     0.18%     0.18%  server   liburing.so.2.2   [.] 0x0000000000002c1c
+     0.18%     0.18%  server   liburing.so.2.2   [.] 0x0000000000002c73
+     0.18%     0.18%  server   liburing.so.2.2   [.] 0x0000000000002c77
+     0.18%     0.18%  server   liburing.so.2.2   [.] 0x0000000000002d86
+     0.18%     0.18%  server   liburing.so.2.2   [.] 0x0000000000002da1
+     0.18%     0.18%  server   server            [.] 0x0000000000003390
+     0.18%     0.18%  server   server            [.] 0x000000000000db69
+     0.18%     0.18%  server   server            [.] 0x000000000000db93
+     0.18%     0.18%  server   server            [.] 0x000000000000dbb0
+     0.18%     0.18%  server   server            [.] 0x000000000000eb20
+     0.18%     0.18%  server   server            [.] 0x000000000000eb23
+     0.18%     0.18%  server   server            [.] 0x000000000000eb91
+     0.18%     0.18%  server   server            [.] 0x000000000000ebab
+     0.18%     0.18%  server   server            [.] 0x000000000000ec51
+     0.18%     0.18%  server   server            [.] 0x000000000000ec58
+     0.18%     0.18%  server   server            [.] 0x000000000000ec85
+     0.18%     0.18%  server   server            [.] 0x000000000000ec93
+     0.18%     0.18%  server   server            [.] 0x000000000000f1a7
+     0.18%     0.18%  server   server            [.] 0x000000000000f27d
+     0.18%     0.18%  server   server            [.] 0x000000000000f2bc
+     0.18%     0.18%  server   server            [.] 0x000000000000f2cc
+     0.18%     0.18%  server   server            [.] 0x000000000000f568
+     0.18%     0.18%  server   server            [.] 0x000000000000f57e
+     0.18%     0.18%  server   liburing.so.2.2   [.] 0x0000000000002d4b
+     0.18%     0.18%  server   liburing.so.2.2   [.] 0x0000000000002d99
+     0.18%     0.18%  server   liburing.so.2.2   [.] 0x0000000000002ccd
+     0.18%     0.18%  server   liburing.so.2.2   [.] 0x0000000000002cfb
+     0.18%     0.00%  server   server            [.] 0x0000558d2f8116cd
+     0.18%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188bd3
+     0.18%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188c1c
+     0.18%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188c73
+     0.18%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188c77
+     0.18%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188ccd
+     0.18%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188cfb
+     0.18%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188d4b
+     0.18%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188d86
+     0.18%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188d99
+     0.18%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188da1
+     0.18%     0.00%  server   liburing.so.2.2   [.] 0x00007f152a188dc6
+     0.18%     0.00%  server   server            [.] 0x0000558d2f805390
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fb4e
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fb59
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fb69
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fb79
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fb93
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fba0
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fbb0
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fbbb
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fbc0
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fbc8
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fbd7
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fbe8
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fbf7
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fc11
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fc18
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fc23
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fc90
+     0.18%     0.00%  server   server            [.] 0x0000558d2f80fcb3
+     0.18%     0.00%  server   server            [.] 0x0000558d2f810206
+     0.18%     0.00%  server   server            [.] 0x0000558d2f81020d
+     0.18%     0.00%  server   server            [.] 0x0000558d2f81022d
+     0.18%     0.00%  server   server            [.] 0x0000558d2f810240
+     0.18%     0.00%  server   server            [.] 0x0000558d2f8102a3
+     0.18%     0.00%  server   server            [.] 0x0000558d2f8102a9
+     0.18%     0.00%  server   server            [.] 0x0000558d2f8102ad
+     0.18%     0.00%  server   server            [.] 0x0000558d2f8102be
+     0.18%     0.00%  server   server            [.] 0x0000558d2f8102ca
+     0.18%     0.00%  server   server            [.] 0x0000558d2f8102ce
+     0.18%     0.00%  server   server            [.] 0x0000558d2f8104e7
+     0.18%     0.00%  server   server            [.] 0x0000558d2f810560
+     0.18%     0.00%  server   server            [.] 0x0000558d2f8105b5
+     0.18%     0.00%  server   server            [.] 0x0000558d2f810b20
+     0.18%     0.00%  server   server            [.] 0x0000558d2f810b23
+     0.18%     0.00%  server   server            [.] 0x0000558d2f810b91
+     0.18%     0.00%  server   server            [.] 0x0000558d2f810bab
+     0.18%     0.00%  server   server            [.] 0x0000558d2f810c51
+     0.18%     0.00%  server   server            [.] 0x0000558d2f810c58
+     0.18%     0.00%  server   server            [.] 0x0000558d2f810c85
+     0.18%     0.00%  server   server            [.] 0x0000558d2f810c93
+     0.18%     0.00%  server   server            [.] 0x0000558d2f8111a7
+     0.18%     0.00%  server   server            [.] 0x0000558d2f81127d
+     0.18%     0.00%  server   server            [.] 0x0000558d2f8112cc
+     0.18%     0.00%  server   server            [.] 0x0000558d2f81157e
+     0.18%     0.00%  server   server            [.] 0x0000558d2f811602
+     0.18%     0.00%  server   server            [.] 0x0000558d2f811610
+     0.18%     0.00%  server   server            [.] 0x0000558d2f811694
+     0.18%     0.00%  server   server            [.] 0x0000558d2f8116db
+
+
+#
+# (Tip: To add Node.js USDT(User-Level Statically Defined Tracing): perf buildid-cache --add `which node`)
+#

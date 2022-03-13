@@ -1,0 +1,114 @@
+# To display the perf.data header info, please use --header/--header-only options.
+#
+#
+# Total Lost Samples: 0
+#
+# Samples: 2  of event 'cpu-clock:uhpppH'
+# Event count (approx.): 20202020
+#
+# Children      Self  Command       Shared Object       Symbol                
+# ........  ........  ............  ..................  ......................
+#
+   100.00%     0.00%  epoll_server  [unknown]           [.] 0x5541d68949564100
+            |
+            ---0x5541d68949564100
+               0x7fc666688d0a
+               0x5624367cca87
+               |          
+               |--50.00%--0x5624367d5916
+               |          0x5624367cd2e6
+               |          0x5624367ccfe2
+               |          0x7fc666a7112a
+               |          
+                --50.00%--0x5624367d58ec
+                          0x5624367d55c9
+                          0x5624367cefff
+
+   100.00%     0.00%  epoll_server  libc-2.31.so        [.] 0x00007fc666688d0a
+            |
+            ---0x7fc666688d0a
+               0x5624367cca87
+               |          
+               |--50.00%--0x5624367d5916
+               |          0x5624367cd2e6
+               |          0x5624367ccfe2
+               |          0x7fc666a7112a
+               |          
+                --50.00%--0x5624367d58ec
+                          0x5624367d55c9
+                          0x5624367cefff
+
+   100.00%     0.00%  epoll_server  epoll_server        [.] 0x00005624367cca87
+            |
+            ---0x5624367cca87
+               |          
+               |--50.00%--0x5624367d5916
+               |          0x5624367cd2e6
+               |          0x5624367ccfe2
+               |          0x7fc666a7112a
+               |          
+                --50.00%--0x5624367d58ec
+                          0x5624367d55c9
+                          0x5624367cefff
+
+    50.00%    50.00%  epoll_server  libpthread-2.31.so  [.] 0x000000000001312a
+            |
+            ---0x5541d68949564100
+               0x7fc666688d0a
+               0x5624367cca87
+               0x5624367d5916
+               0x5624367cd2e6
+               0x5624367ccfe2
+               0x7fc666a7112a
+
+    50.00%    50.00%  epoll_server  epoll_server        [.] 0x0000000000005fff
+            |
+            ---0x5541d68949564100
+               0x7fc666688d0a
+               0x5624367cca87
+               0x5624367d58ec
+               0x5624367d55c9
+               0x5624367cefff
+
+    50.00%     0.00%  epoll_server  epoll_server        [.] 0x00005624367d5916
+            |
+            ---0x5624367d5916
+               0x5624367cd2e6
+               0x5624367ccfe2
+               0x7fc666a7112a
+
+    50.00%     0.00%  epoll_server  epoll_server        [.] 0x00005624367cd2e6
+            |
+            ---0x5624367cd2e6
+               0x5624367ccfe2
+               0x7fc666a7112a
+
+    50.00%     0.00%  epoll_server  epoll_server        [.] 0x00005624367d58ec
+            |
+            ---0x5624367d58ec
+               0x5624367d55c9
+               0x5624367cefff
+
+    50.00%     0.00%  epoll_server  epoll_server        [.] 0x00005624367ccfe2
+            |
+            ---0x5624367ccfe2
+               0x7fc666a7112a
+
+    50.00%     0.00%  epoll_server  epoll_server        [.] 0x00005624367d55c9
+            |
+            ---0x5624367d55c9
+               0x5624367cefff
+
+    50.00%     0.00%  epoll_server  epoll_server        [.] 0x00005624367cefff
+            |
+            ---0x5624367cefff
+
+    50.00%     0.00%  epoll_server  libpthread-2.31.so  [.] 0x00007fc666a7112a
+            |
+            ---0x7fc666a7112a
+
+
+
+#
+# (Tip: See assembly instructions with percentage: perf annotate <symbol>)
+#
