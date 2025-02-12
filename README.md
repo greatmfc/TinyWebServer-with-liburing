@@ -10,7 +10,9 @@
 
 （20220513）该项目IO方面需要进一步改进，先前的性能测试结果有待更正。
 
-（20220625）👴有一个有趣的想法，等有空一定填坑。
+（20220625）有一个有趣的想法，等有空一定填坑。
+
+（20250212）该项目暂已弃坑，欢迎浏览另一个文件传输兼http服务器项目[Simple File Transfer](https://github.com/greatmfc/simple-file-transfer)。项目[Simple File Transfer](https://github.com/greatmfc/simple-file-transfer)在功能上支持浏览器通过URL访问指定服务器文件、断点续传等基础http服务器功能，也支持点对点的文件传输；在性能上以C++20协程为基础实现非阻塞异步IO，关闭日志的默认状态下部分场景性能同nginx的默认状态一致。
 
 ## 内容介绍
 
